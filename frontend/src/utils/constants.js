@@ -1,0 +1,11 @@
+export const GAME_WIDTH = 800;
+export const GAME_HEIGHT = 560;
+export const PLAYER_SPEED = 8;
+export const BULLET_SPEED = 10;
+export const ENEMY_BULLET_SPEED = 5;
+export const ENEMY_ROWS = 3;
+export const ENEMY_COLS = 8;
+export const PLAYER_LIVES = 3;
+export const ENEMY_SHOT_COOLDOWN = 1000;
+export const PLAYER_SHOT_COOLDOWN = 300;
+export const SHOOT_COOLDOWN = 1000;

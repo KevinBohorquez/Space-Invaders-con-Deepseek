@@ -1,0 +1,19 @@
+{
+  "name": "space-invaders",
+  "version": "1.0.0",
+  "description": "Juego Space Invaders completo con frontend y backend",
+  "scripts": {
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm start",
+    "test:backend": "cd backend && npm test",
+    "db:init": "cd backend && npm run db:init"
+  },
+  "keywords": ["space-invaders", "game", "kaboom", "express", "mysql"],
+  "author": "Prompt Maestro",
+  "license": "MIT"
+}

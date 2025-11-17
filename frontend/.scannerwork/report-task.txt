@@ -1,0 +1,6 @@
+projectKey=space-invader-frontend
+serverUrl=http://localhost:9000
+serverVersion=25.8.0.112029
+dashboardUrl=http://localhost:9000/dashboard?id=space-invader-frontend
+ceTaskId=99dd4a50-3fbd-414b-a49d-e9fd0ba7224a
+ceTaskUrl=http://localhost:9000/api/ce/task?id=99dd4a50-3fbd-414b-a49d-e9fd0ba7224a
