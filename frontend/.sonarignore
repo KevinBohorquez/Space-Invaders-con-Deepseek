@@ -1,0 +1,33 @@
+# Ignorar directorios completos
+coverage/
+dist/
+node_modules/
+build/
+.scannerwork/
+
+# Ignorar archivos de test
+test/
+**/*.test.js
+
+# Ignorar archivos de configuración
+package.json
+package-lock.json
+.gitignore
+*.md
+
+# Ignorar archivos HTML y CSS de coverage
+**/*.html
+**/*.css
+
+# Ignorar archivos JavaScript de reportes
+**/sorter.js
+**/block-navigation.js
+**/prettify.js
+**/base.css
+
+# Ignorar archivos legacy
+src/main.js
+src/game/game.js
+
+# Ignorar archivos de build
+dist/assets/*.js

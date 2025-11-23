@@ -3,19 +3,27 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
-    "test": "jest",
-    "db:init": "node -e \"import dotenv from 'dotenv'; dotenv.config(); import { createConnection } from 'mysql2/promise'; import { readFileSync } from 'fs'; const sql = readFileSync('schema.sql', 'utf8'); const conn = await createConnection({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASS, port: process.env.DB_PORT }); await conn.query('CREATE DATABASE IF NOT EXISTS ' + process.env.DB_NAME); await conn.query('USE ' + process.env.DB_NAME); const statements = sql.split(';').filter(s => s.trim()); for (const stmt of statements) { await conn.query(stmt); } console.log('Database initialized successfully'); process.exit(0);\""
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "test": "cross-env NODE_ENV=test mocha \"test/**/*.test.js\" --exit --timeout 5000",
+    "test:watch": "cross-env NODE_ENV=test mocha \"test/**/*.test.js\" --watch --exit",
+    "test:coverage": "cross-env NODE_ENV=test c8 --reporter=lcov --reporter=text --reporter=html mocha \"test/**/*.test.js\" --exit --timeout 5000",
+    "test:unit": "cross-env NODE_ENV=test mocha \"test/{validation,scoreService,scoreController}.test.js\" --exit",
+    "test:integration": "cross-env NODE_ENV=test mocha \"test/integration.test.js\" --exit --timeout 10000"
   },
   "dependencies": {
-    "express": "4.19.2",
-    "cors": "2.8.5",
-    "mysql2": "3.11.4",
-    "dotenv": "16.4.5"
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0"
   },
   "devDependencies": {
-    "jest": "29.7.0",
-    "supertest": "6.3.4"
+    "c8": "^8.0.1",
+    "chai": "^4.3.10",
+    "cross-env": "^10.1.0",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.0.1",
+    "sinon": "^17.0.1",
+    "supertest": "^6.3.3"
   }
 }

@@ -58,9 +58,12 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor backend ejecutándose en http://localhost:${PORT}`);
-    console.log(`📊 API disponible en http://localhost:${PORT}/api`);
-});
+// Solo iniciar el servidor si no estamos en modo test
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor backend ejecutándose en http://localhost:${PORT}`);
+        console.log(`📊 API disponible en http://localhost:${PORT}/api`);
+    });
+}
 
 export default app;

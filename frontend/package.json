@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "kaboom": "3000.1.17"
+    "test": "mocha test/**/*.test.js --timeout 5000",
+    "test:coverage": "c8 --all --reporter=lcov --reporter=text --reporter=html mocha test/**/*.test.js",
+    "test:watch": "mocha test/**/*.test.js --watch --timeout 5000",
+    "sonar": "npm run test:coverage && sonar-scanner",
+    "sonar:local": "npm run test:coverage && sonar-scanner -Dsonar.host.url=http://localhost:9000",
+    "clean": "rm -rf coverage .scannerwork"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "c8": "^8.0.1",
+    "chai": "^4.3.7",
+    "jsdom": "^22.1.0",
+    "mocha": "^10.2.0",
+    "sonar-scanner": "^3.1.0"
   }
 }
