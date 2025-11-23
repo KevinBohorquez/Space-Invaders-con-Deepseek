@@ -15,6 +15,13 @@ export class GameScene {
         this.gameOver = false;
         this.won = false;
         this.lastShotTime = 0;
+        
+        // Variables para movimiento de enemigos
+        this.enemyDirection = 1; // 1 = derecha, -1 = izquierda
+        this.enemySpeed = 1;
+        this.enemyMoveCounter = 0;
+        this.enemyMoveDelay = 30; // Frames entre movimientos (más alto = más lento)
+        this.enemyDescendAmount = 20; // Píxeles que bajan al cambiar dirección
     }
 
     enter(data = {}) {
@@ -26,6 +33,9 @@ export class GameScene {
         this.gameOver = false;
         this.won = false;
         this.lastShotTime = 0;
+        this.enemyDirection = 1;
+        this.enemySpeed = 20;
+        this.enemyMoveCounter = 0;
         this.createEnemies();
     }
 
@@ -40,11 +50,74 @@ export class GameScene {
     update() {
         if (this.gameOver) return;
 
+        this.updateEnemyMovement();
         this.updateBullets();
         this.updateEnemyBullets();
         this.checkCollisions();
         this.enemyShooting();
         this.checkGameStatus();
+        this.checkEnemyReachedPlayer();
+    }
+
+    updateEnemyMovement() {
+        this.enemyMoveCounter++;
+        
+        if (this.enemyMoveCounter >= this.enemyMoveDelay) {
+            this.enemyMoveCounter = 0;
+            
+            // Verificar si algún enemigo vivo llegó al borde
+            let shouldDescend = false;
+            const aliveEnemies = this.enemies.filter(e => e.alive);
+            
+            for (let enemy of aliveEnemies) {
+                if (this.enemyDirection === 1 && enemy.x + enemy.width >= GAME_WIDTH - 10) {
+                    shouldDescend = true;
+                    break;
+                } else if (this.enemyDirection === -1 && enemy.x <= 10) {
+                    shouldDescend = true;
+                    break;
+                }
+            }
+            
+            if (shouldDescend) {
+                // Bajar y cambiar dirección
+                aliveEnemies.forEach(enemy => {
+                    enemy.y += this.enemyDescendAmount;
+                });
+                this.enemyDirection *= -1;
+                
+                // Aumentar velocidad gradualmente (más rápido con menos enemigos)
+                if (aliveEnemies.length < 10) {
+                    this.enemyMoveDelay = Math.max(10, 20);
+                } else if (aliveEnemies.length < 20) {
+                    this.enemyMoveDelay = Math.max(15, 25);
+                }
+            } else {
+                // Mover horizontalmente
+                aliveEnemies.forEach(enemy => {
+                    enemy.x += this.enemySpeed * this.enemyDirection;
+                });
+            }
+        }
+    }
+
+    checkEnemyReachedPlayer() {
+        // Verificar si algún enemigo llegó a la altura del jugador
+        const aliveEnemies = this.enemies.filter(e => e.alive);
+        for (let enemy of aliveEnemies) {
+            if (enemy.y + enemy.height >= this.player.y) {
+                // Game over - los enemigos llegaron al jugador
+                this.gameOver = true;
+                this.won = false;
+                setTimeout(() => {
+                    this.game.changeScene('gameover', {
+                        score: this.score,
+                        won: this.won
+                    });
+                }, 1000);
+                return;
+            }
+        }
     }
 
     updateBullets() {
@@ -62,36 +135,35 @@ export class GameScene {
     }
 
     enemyShooting() {
-    const currentTime = Date.now();
+        const currentTime = Date.now();
 
-    // Solo permitir 1 disparo global cada 800ms (opcional)
-    if (!this.globalEnemyShotTime) this.globalEnemyShotTime = 0;
-    if (currentTime - this.globalEnemyShotTime < 300) return;
+        // Solo permitir 1 disparo global cada 300ms
+        if (!this.globalEnemyShotTime) this.globalEnemyShotTime = 0;
+        if (currentTime - this.globalEnemyShotTime < 300) return;
 
-    // Enemigos vivos
-    const aliveEnemies = this.enemies.filter(e => e.alive);
+        // Enemigos vivos
+        const aliveEnemies = this.enemies.filter(e => e.alive);
 
-    if (aliveEnemies.length === 0) return;
+        if (aliveEnemies.length === 0) return;
 
-    // Elegir 1 enemigo aleatorio
-    const randomEnemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+        // Elegir 1 enemigo aleatorio
+        const randomEnemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
 
-    // Intentar disparar con su cooldown interno
-    const bulletData = randomEnemy.shoot(currentTime);
+        // Intentar disparar con su cooldown interno
+        const bulletData = randomEnemy.shoot(currentTime);
 
-    if (bulletData) {
-        this.enemyBullets.push(new Bullet(
-            bulletData.x, bulletData.y,
-            bulletData.width, bulletData.height,
-            bulletData.speed,
-            false
-        ));
+        if (bulletData) {
+            this.enemyBullets.push(new Bullet(
+                bulletData.x, bulletData.y,
+                bulletData.width, bulletData.height,
+                bulletData.speed,
+                false
+            ));
 
-        // Guardar tiempo del disparo global
-        this.globalEnemyShotTime = currentTime;
+            // Guardar tiempo del disparo global
+            this.globalEnemyShotTime = currentTime;
+        }
     }
-}
-
 
     checkCollisions() {
         // Colisiones bala-enemigo
@@ -103,7 +175,7 @@ export class GameScene {
                     enemy.alive = false;
                     this.bullets.splice(i, 1);
                     this.score += 100;
-                    break; // Salir del loop interno
+                    break;
                 }
             }
         }
@@ -117,7 +189,6 @@ export class GameScene {
                 if (!stillAlive) {
                     this.gameOver = true;
                     this.won = false;
-                    // Cambiar a gameover después de un breve delay
                     setTimeout(() => {
                         this.game.changeScene('gameover', {
                             score: this.score,
@@ -141,7 +212,6 @@ export class GameScene {
         if (aliveEnemies === 0 && !this.gameOver) {
             this.gameOver = true;
             this.won = true;
-            // Cambiar a gameover después de un breve delay
             setTimeout(() => {
                 this.game.changeScene('gameover', {
                     score: this.score,
@@ -228,8 +298,6 @@ export class GameScene {
     }
 
     exit() {
-        // No necesitamos hacer nada aquí porque el cambio de escena
-        // se maneja en checkCollisions y checkGameStatus
         return null;
     }
 }

@@ -81,8 +81,8 @@ class SpaceInvadersGame {
     
     startGame() {
         this.playerName = this.playerNameInput.value.trim() || 'JUGADOR';
-        if (this.playerName.length > 12) {
-            this.playerName = this.playerName.substring(0, 12);
+        if (this.playerName.length > 15) {
+            this.playerName = this.playerName.substring(0, 15);
         }
         this.hideNameInput();
         this.changeScene('game');

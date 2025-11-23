@@ -63,6 +63,11 @@ class SpaceInvadersGame {
             }
         });
 
+        // Validación en tiempo real del input
+        this.playerNameInput.addEventListener('input', () => {
+            this.updateStartButtonState();
+        });
+
         // Click en el canvas para menú principal
         this.canvas.addEventListener('click', (e) => {
             if (this.sceneManager.currentScene === 'start') {
@@ -71,6 +76,19 @@ class SpaceInvadersGame {
                 this.changeScene('start');
             }
         });
+    }
+
+    updateStartButtonState() {
+        const name = this.playerNameInput.value.trim();
+        if (name === '') {
+            this.startBtn.disabled = true;
+            this.startBtn.style.opacity = '0.5';
+            this.startBtn.style.cursor = 'not-allowed';
+        } else {
+            this.startBtn.disabled = false;
+            this.startBtn.style.opacity = '1';
+            this.startBtn.style.cursor = 'pointer';
+        }
     }
     
     handleGlobalKeys(e) {
@@ -108,6 +126,7 @@ class SpaceInvadersGame {
         this.nameInput.classList.remove('hidden');
         this.playerNameInput.focus();
         this.playerNameInput.value = '';
+        this.updateStartButtonState();
     }
     
     hideNameInput() {
@@ -123,9 +142,21 @@ class SpaceInvadersGame {
     }
     
     startGame() {
-        this.playerName = this.playerNameInput.value.trim() || 'JUGADOR';
-        if (this.playerName.length > 12) {
-            this.playerName = this.playerName.substring(0, 12);
+        const name = this.playerNameInput.value.trim();
+        
+        // Validar que el nombre no esté vacío
+        if (name === '') {
+            this.playerNameInput.focus();
+            this.playerNameInput.style.borderColor = '#ff0000';
+            setTimeout(() => {
+                this.playerNameInput.style.borderColor = '';
+            }, 500);
+            return;
+        }
+        
+        this.playerName = name;
+        if (this.playerName.length > 15) {
+            this.playerName = this.playerName.substring(0, 15);
         }
         this.hideNameInput();
         this.changeScene('game');
